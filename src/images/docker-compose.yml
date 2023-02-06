@@ -1,0 +1,14 @@
+version: '3.9'
+
+services:
+  db:
+    image: mysql
+    container_name: db_images
+    environment:
+      - MYSQL_DATABASE=images
+      - MYSQL_ROOT_PASSWORD=${DB_IMAGES_PASSWORD}
+    ports:
+      - 3308:3306
+    volumes:
+      - ../../db/images/mysql:/var/lib/mysql
+      - ../../db/images/init.d:/docker-entrypoint-initdb.d

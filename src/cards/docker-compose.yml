@@ -1,0 +1,14 @@
+version: '3.9'
+
+services:
+  db:
+    image: mysql
+    container_name: db_cards
+    environment:
+      - MYSQL_DATABASE=cards
+      - MYSQL_ROOT_PASSWORD=${DB_CARDS_PASSWORD}
+    ports:
+      - 3307:3306
+    volumes:
+      - ../../db/cards/mysql:/var/lib/mysql
+      - ../../db/cards/init.d:/docker-entrypoint-initdb.d

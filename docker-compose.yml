@@ -1,0 +1,29 @@
+version: '3.9'
+
+services:
+  db_collections:
+    extends:
+      file: ./src/collections/docker-compose.yml
+      service: db
+  db_cards:
+    extends:
+      file: ./src/cards/docker-compose.yml
+      service: db
+  db_images:
+    extends:
+      file: ./src/images/docker-compose.yml
+      service: db
+  db_tests:
+    extends:
+      file: ./src/tests/docker-compose.yml
+      service: db
+volumes:
+  db:
+    driver: local
+
+networks:
+  default:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.1.0/24

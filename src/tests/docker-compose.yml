@@ -1,0 +1,14 @@
+version: '3.9'
+
+services:
+  db:
+    image: mysql
+    container_name: db_tests
+    environment:
+      - MYSQL_DATABASE=tests
+      - MYSQL_ROOT_PASSWORD=${DB_TESTS_PASSWORD}
+    ports:
+      - 3309:3306
+    volumes:
+      - ../../db/tests/mysql:/var/lib/mysql
+      - ../../db/tests/init.d:/docker-entrypoint-initdb.d

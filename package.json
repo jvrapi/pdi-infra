@@ -1,0 +1,13 @@
+{
+  "name": "infra",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "node src/index.js"
+  },
+  "devDependencies": {
+    "prisma": "^4.9.0"
+  }
+}
