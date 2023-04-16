@@ -1,28 +1,55 @@
 version: '3.9'
 
 services:
-  db_collections:
-    extends:
-      file: ./src/collections/docker-compose.yml
-      service: db
-  db_cards:
-    extends:
-      file: ./src/cards/docker-compose.yml
-      service: db
-  db_images:
-    extends:
-      file: ./src/images/docker-compose.yml
-      service: db
-  db_tests:
-    extends:
-      file: ./src/tests/docker-compose.yml
-      service: db
-volumes:
   db:
-    driver: local
+    image: mysql
+    container_name: pdi_database_main
+    environment:
+      - MYSQL_DATABASE=collections
+      - MYSQL_ROOT_PASSWORD=${DB_MAIN_PASSWORD}
+    ports:
+      - 3306:3306
+    volumes:
+      - ./init:/docker-entrypoint-initdb.d
+  
+
+  db_tests:
+    image: mysql
+    container_name: pdi_database_tests
+    environment:
+      - MYSQL_DATABASE=tests
+      - MYSQL_ROOT_PASSWORD=${DB_TESTS_PASSWORD}
+    ports:
+      - 3307:3306
+
+  cards:
+    build: ../cards
+    container_name: pdi_cards_service
+    # restart: always
+    ports: 
+      - 4001:4001
+      - 9230:9230 #Você pode inserir essa porta tbm pra poder usar o debug
+    links: 
+      - db
+    depends_on:
+      - db
+
+  collections:
+    build: ../collections
+    container_name: pdi_collections_service
+    # restart: always
+    ports: 
+      - 4000:4000
+      - 9229:9229 #Você pode inserir essa porta tbm pra poder usar o debug
+    links: 
+      - db
+      - cards
+    depends_on:
+      - db
+      - cards
 
 networks:
-  default:
+  pdi:
     driver: bridge
     ipam:
       config:
