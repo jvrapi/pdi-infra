@@ -12,7 +12,6 @@ services:
     volumes:
       - ./init:/docker-entrypoint-initdb.d
   
-
   db_tests:
     image: mysql
     container_name: pdi_database_tests
@@ -22,31 +21,66 @@ services:
     ports:
       - 3307:3306
 
+  redis:
+    image: 'redis:alpine'
+    container_name: pdi_redis
+    command: redis-server --requirepass ${REDIS_PASSWORD} 
+    ports:
+      - 6379:6379
+
+  rabbitmq:
+    image: "rabbitmq:3.12-rc-management-alpine"
+    container_name: pdi_rabbitmq 
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD}
+
   cards:
-    build: ../cards
+    build: ../services/cards
     container_name: pdi_cards_service
     # restart: always
     ports: 
-      - 4001:4001
-      - 9230:9230 #Você pode inserir essa porta tbm pra poder usar o debug
+      - 4001:4000
+    links: 
+      - db
+      - rabbitmq
+    depends_on:
+      - db
+      - rabbitmq
+
+  users:
+    build: ../services/users
+    container_name: pdi_users_service
+    # restart: always
+    ports: 
+      - 3000:3000
     links: 
       - db
     depends_on:
       - db
 
   collections:
-    build: ../collections
+    build: ../services/collections
     container_name: pdi_collections_service
     # restart: always
     ports: 
       - 4000:4000
-      - 9229:9229 #Você pode inserir essa porta tbm pra poder usar o debug
     links: 
       - db
+      - redis
+      - users
       - cards
+      - rabbitmq
     depends_on:
       - db
+      - redis
+      - users
       - cards
+      - rabbitmq
+      
 
 networks:
   pdi:
